@@ -1,13 +1,13 @@
 {
-    "cityName": "Cities",
+    "cityName": "Kenya",
     "institution": "The Alan Turing Institute",
-    "projectBlurb": "Colouring {City Name} is part of Colouring Cities.",
+    "projectBlurb": "Colouring Kenya is part of Colouring Cities.",
     
-    "githubURL": "https://github.com/colouring-cities/colouring-core",
-    "manualURL": "https://github.com/colouring-cities/manual/wiki/M3.-COLOURING-BRITAIN",
-    "privacyStatement": "{Privacy statement goes here}",
+    "githubURL": "https://github.com/colouring-cities/colouring-kenya",
+    "manualURL": "https://github.com/colouring-cities/manual/wiki/M3.-COLOURING-KENYA",
+    "privacyStatement": "Colouring Kenya stores your data at The Alan Turing Institute in London behind the organisation’s firewall in a secure database using industry standard practices",
 
-    "initialMapPosition": [ 51.5245255, -0.1338422 ],
+    "initialMapPosition": [36.821945, -1.292066],
     "initialZoomLevel": 16,
 
     "postcode": "Postcode",
