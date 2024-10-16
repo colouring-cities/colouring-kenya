@@ -13,7 +13,7 @@
     "postcode": "Postcode",
     "energy_rating": "Building Research Establishment Environmental Assessment Method (BREEAM) rating [<a href='https://bregroup.com/products/breeam/how-breeam-works'>More info</a>]",
 
-    "bbox": [-61149.622628, 6667754.851372, 37183, 6744803.375884],
+    "bbox": [-517786.6072,3771708.7237,596939.2522,4666939.1990],
 
     "basemapTileUrl": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
     "baseAttribution": "Building attribute data is © Colouring Cities contributors. Basemap © <a href=https://www.openstreetmap.org/copyright>OpenStreetMap contributors</a>. Building © MODIFY TO PROVIDE RELEVANT INFO"
