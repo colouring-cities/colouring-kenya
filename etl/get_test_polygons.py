@@ -18,9 +18,9 @@ osmnx.config(log_console=True, use_cache=True)
 # configure the image display
 size = 256
 
-# load buildings from about 1.5km² around UCL
-point = (51.524498, -0.133874)
-dist = 612
+# load buildings from about 1.5km² around Nairobi
+point = (-1.286389, 36.817223)
+dist = 1500
 tags = {"building": True}
 gdf = osmnx.features_from_point(point, tags, dist=dist)
 
