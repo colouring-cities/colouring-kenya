@@ -67,14 +67,14 @@ function getCurrentMenuLinks(username: string): MenuLink[][] {
                 external: true
             },
             {
-                to: "/showcase.html",
-                text: "Case Study Showcase",
-                disabled: true,
+                to: "https://colouringcities.org/impact-studies",
+                text: "Impact Study Showcase",
+                external: true
             },
         ],
         [
             {
-                to: "https://github.com/colouring-cities/manual/wiki/A.-What-is-the-CCRP%3F",
+                to: "https://github.com/colouring-cities/manual/wiki/A.-ABOUT",
                 text: "About the Colouring Cities Research Programme",
                 external: true
             },
@@ -84,12 +84,17 @@ function getCurrentMenuLinks(username: string): MenuLink[][] {
                 external: true
             },
             {
-                to: "https://github.com/colouring-cities/manual/wiki/A2.-How-to%3F-Guides",
+                to: "https://github.com/colouring-cities/manual/wiki/M3.1-News",
+                text: "Colouring Cities development news",
+                external: true
+            },
+            {
+                to: "https://github.com/colouring-cities/manual/wiki/How‐to‐use-Platform-Guides",
                 text: "How to Use",
                 external: true
             },
             {
-                to: "https://github.com/colouring-cities/manual/wiki/I.--DATA",
+                to: "https://github.com/colouring-cities/manual/wiki/E1.--DATA",
                 text: "Data Categories",
                 external: true
             },
@@ -99,7 +104,7 @@ function getCurrentMenuLinks(username: string): MenuLink[][] {
                 external: true
             },
             {
-                to: "https://github.com/colouring-cities/manual/wiki/F1.-ETHICAL-FRAMEWORK-and-ethics-policies",
+                to: "https://github.com/colouring-cities/manual/wiki/ETHICAL-FRAMEWORK",
                 text: "Ethical Framework",
                 external: true
             }
@@ -132,8 +137,9 @@ function getCurrentMenuLinks(username: string): MenuLink[][] {
                 external: true
             },
             {
-                to: "/code-of-conduct.html",
-                text: "Code of Conduct"
+                to: "https://github.com/colouring-cities/manual/wiki/F2.-PROTOCOLS-&-CODES-OF-CONDUCT#ccrp-contributor-code-of-conduct",
+                text: "Code of Conduct",
+                external: true
             },
             {
                 to: "https://github.com/colouring-cities/manual/wiki/F2.-PROTOCOLS-&-CODES-OF-CONDUCT#ccrp-equality-diversity-and-inclusion-policy",

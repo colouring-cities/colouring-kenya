@@ -10,7 +10,7 @@ import './welcome.css';
 const Welcome = () => (
     <div className="section-body welcome">
         <Categories mode="view"/>
-        <h1 className="h2">Welcome to Colouring {config.cityName}!</h1>
+        <h1 className="h3">Welcome to Colouring {config.cityName}!</h1>
         <p>
 
             Colouring {config.cityName}  is a research-led, free public resource, providing open spatial data 
@@ -29,13 +29,13 @@ const Welcome = () => (
         <p>
             New data and features are added all the time. We are keen to engage as many people as possible in platform development. 
             Whether you are a resident, or a stakeholder in academia, government, industry or the third sector, any help you can give 
-            colouring in our Colouring Cities maps, and enriching and verifying our open databases with your knowledge, is greatly appreciated.
+            colouring-in our Colouring Cities maps, and enriching and verifying our open databases with your knowledge, is greatly appreciated.
         </p>
         <p>
             All data collected (e.g <a href="/data-extracts.html">data-extracts</a>) 
             and <a href="https://github.com/colouring-cities/colouring-core">code</a> are free to download, 
             use and share under open licence terms. Our <a href="https://github.com/colouring-cities/manual/wiki">
-            open manual</a> also provides non-technical information for anyone interested in our research.
+            open manual</a> provides non-technical information for anyone interested in our research. We also have a <a href="https://github.com/colouring-cities/ccrp-technical-manual/wiki">Technical Manual</a>, and an <a href="https://colouringcities.org/impact-studies">Impact Studies Section</a> which shows how the data from the platform can be used.
         </p>
         <Link to="/view/categories"
             className="btn btn-outline-dark btn-lg btn-block">

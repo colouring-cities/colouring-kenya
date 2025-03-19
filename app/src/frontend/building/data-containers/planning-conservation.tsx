@@ -1,24 +1,24 @@
 import React, { Fragment } from 'react';
 
 import '../../map/map-button.css';
-import { Link } from 'react-router-dom';
-import InfoBox from '../../components/info-box';
-import NumericDataEntryWithFormattedLink from '../data-components/numeric-data-entry-with-formatted-link';
 import { buildingUserFields, dataFields } from '../../config/data-fields-config';
-import NumericDataEntry from '../data-components/numeric-data-entry';
-import UserOpinionEntry from '../data-components/user-opinion-data-entry';
-
-import DataEntry from '../data-components/data-entry';
-import { LogicalDataEntry } from '../data-components/logical-data-entry/logical-data-entry';
+import { MultiDataEntry } from '../data-components/multi-data-entry/multi-data-entry';
 import { DataEntryGroup } from '../data-components/data-entry-group';
+import { Link } from 'react-router-dom';
+import { Category } from '../../config/categories-config';
+import NumericDataEntry from '../data-components/numeric-data-entry';
 import SelectDataEntry from '../data-components/select-data-entry';
 import Verification from '../data-components/verification';
 import withCopyEdit from '../data-container';
-import PlanningDataOfficialDataEntry from '../data-components/planning-data-entry';
+import DataEntry from '../data-components/data-entry';
+import InfoBox from '../../components/info-box';
+
 import { CategoryViewProps } from './category-view-props';
-import { Category } from '../../config/categories-config';
+import { LogicalDataEntry } from '../data-components/logical-data-entry/logical-data-entry';
 import { useDisplayPreferences } from '../../displayPreferences-context';
-import { MultiDataEntry } from '../data-components/multi-data-entry/multi-data-entry';
+import PlanningDataOfficialDataEntry from '../data-components/planning-data-entry';
+import UserOpinionEntry from '../data-components/user-opinion-data-entry';
+import NumericDataEntryWithFormattedLink from '../data-components/numeric-data-entry-with-formatted-link';
 
 const currentTimestamp = new Date().valueOf();
 const milisecondsInYear = 1000 * 60 * 60 * 24 * 365;
@@ -48,7 +48,13 @@ function isArchived(item) {
     return false;
 }
 
-const PlanningView: React.FunctionComponent<CategoryViewProps> = (props) => {
+/**
+* Planning & Conservation view/edit section
+*/
+const PlanningConservationView: React.FunctionComponent<CategoryViewProps> = (props) => {
+    const queryParameters = new URLSearchParams(window.location.search);
+    const subcat = queryParameters.get("sc");
+    
     const switchToExpectedApplicationMapStyle = (e) => {
         e.preventDefault();
         props.onMapColourScale('community_expected_planning_application_total')
@@ -73,35 +79,178 @@ const PlanningView: React.FunctionComponent<CategoryViewProps> = (props) => {
         e.preventDefault();
         props.onMapColourScale('community_local_significance_total')
     }
-    const { flood, floodSwitchOnClick, housing, housingSwitchOnClick, creative, creativeSwitchOnClick, vista, vistaSwitchOnClick, parcel, parcelSwitchOnClick, conservation, conservationSwitchOnClick, darkLightTheme } = useDisplayPreferences();
+
+    const { housing, housingSwitchOnClick, creative, creativeSwitchOnClick, vista, vistaSwitchOnClick, parcel, parcelSwitchOnClick, conservation, conservationSwitchOnClick, darkLightTheme } = useDisplayPreferences();
+    
     const communityLinkUrl = `/${props.mode}/${Category.Community}/${props.building.building_id}`;
     const currentYear = new Date().getFullYear();
 
-    const queryParameters = new URLSearchParams(window.location.search);
-    const subcat = queryParameters.get("sc");
-
     return (
-        <Fragment>
-            <DataEntryGroup name="Current planning applications" collapsed={subcat==null || (subcat!="1" && subcat!="2" && subcat!="3")}>
-                <DataEntryGroup name="Official data" collapsed={subcat==null || subcat!="1"}>
+         <Fragment>
+            <DataEntryGroup name="Planning" collapsed={subcat==null || (subcat!="1" && subcat!="2" && subcat!="3")}>
+                <DataEntryGroup name="Current Planning Applications" collapsed={subcat==null || (subcat!="1" && subcat!="2" && subcat!="3")}>
+                    <DataEntryGroup name="Official Data" collapsed={subcat==null || subcat!="1"}>
+                        <InfoBox>
+                            This section provides data on active applications. We define these as applications with any activity in the last year.
+                            <br />
+                            To comment on an application follow the application link if provided, or visit the relevant local authority's planning page.
+                        </InfoBox>
+                        {props.mapColourScale != "planning_applications_status_all" ?
+                            <button className={`map-switcher-inline disabled-state btn btn-outline btn-outline-dark key-button sub-subcategory-button`} onClick={switchToAllPlanningApplicationsMapStyle}>
+                                {'Click to view official planning application data'}
+                            </button>
+                            :
+                            <></>
+                        }
+                        {props.building.planning_data ?
+                            <PlanningDataOfficialDataEntry  
+                                shownData={props.building.planning_data.filter(item => isArchived(item) == false)}
+                                messageOnMissingData={
+                                    props.building.planning_data.length > 0 ?
+                                        "Only past application data is currently available for this site"
+                                        :
+                                        "No live planning data are currently available for this building from the Planning London Datahub."
+                                }
+                            />
+                        : <></>
+                        }
+                    </DataEntryGroup>
+                    <DataEntryGroup name="Year of Completion" collapsed={subcat==null || subcat!="2"}>
+                        <LogicalDataEntry
+                            slug='planning_crowdsourced_site_completion_status'
+                            title={dataFields.planning_crowdsourced_site_completion_status.title}
+                            tooltip={dataFields.planning_crowdsourced_site_completion_status.tooltip}
+                            value={props.building.planning_crowdsourced_site_completion_status}
+                            copy={props.copy}
+                            onChange={props.onChange}
+                            mode={props.mode}
+                        />
+                        <Verification
+                            slug="planning_crowdsourced_site_completion_status"
+                            allow_verify={props.user !== undefined && props.building.planning_crowdsourced_site_completion_status !== null && !props.edited}
+                            onVerify={props.onVerify}
+                            user_verified={props.user_verified.hasOwnProperty("planning_crowdsourced_site_completion_status")}
+                            user_verified_as={props.user_verified.planning_crowdsourced_site_completion_status}
+                            verified_count={props.building.verified.planning_crowdsourced_site_completion_status}
+                        />
+                        {props.building.planning_crowdsourced_site_completion_status == null ? <></> :
+                            <>
+                                <NumericDataEntry
+                                    title={dataFields.planning_crowdsourced_site_completion_year.title}
+                                    slug="planning_crowdsourced_site_completion_year"
+                                    value={props.building.planning_crowdsourced_site_completion_year}
+                                    mode={props.mode}
+                                    copy={props.copy}
+                                    onChange={props.onChange}
+                                    step={1}
+                                    min={1}
+                                    max={currentYear}
+                                    tooltip={dataFields.planning_crowdsourced_site_completion_year.tooltip}
+                                    />
+                                <Verification
+                                    slug="planning_crowdsourced_site_completion_year"
+                                    allow_verify={props.user !== undefined && props.building.planning_crowdsourced_site_completion_year !== null && !props.edited}
+                                    onVerify={props.onVerify}
+                                    user_verified={props.user_verified.hasOwnProperty("planning_crowdsourced_site_completion_year")}
+                                    user_verified_as={props.user_verified.planning_crowdsourced_site_completion_year}
+                                    verified_count={props.building.verified.planning_crowdsourced_site_completion_year}
+                                    />
+                                <SelectDataEntry
+                                    title={dataFields.planning_crowdsourced_site_completion_source_type.title}
+                                    slug="planning_crowdsourced_site_completion_source_type"
+                                    value={props.building.planning_crowdsourced_site_completion_source_type}
+                                    mode={props.mode}
+                                    copy={props.copy}
+                                    onChange={props.onChange}
+                                    tooltip={dataFields.planning_crowdsourced_site_completion_source_type.tooltip}
+                                    options={dataFields.planning_crowdsourced_site_completion_source_type.items}
+                                    placeholder={dataFields.planning_crowdsourced_site_completion_source_type.example}
+                                />
+                                {(props.building.planning_crowdsourced_site_completion_source_type == dataFields.planning_crowdsourced_site_completion_source_type.items[0] ||
+                                    props.building.planning_crowdsourced_site_completion_source_type == dataFields.planning_crowdsourced_site_completion_source_type.items[1] ||
+                                    props.building.planning_crowdsourced_site_completion_source_type == null) ? <></> :
+                                    <>
+                                        <MultiDataEntry
+                                            title={dataFields.planning_crowdsourced_site_completion_source_links.title}
+                                            slug="planning_crowdsourced_site_completion_source_links"
+                                            value={props.building.planning_crowdsourced_site_completion_source_links}
+                                            mode={props.mode}
+                                            copy={props.copy}
+                                            onChange={props.onChange}
+                                            tooltip={dataFields.planning_crowdsourced_site_completion_source_links.tooltip}
+                                            placeholder="https://..."
+                                            editableEntries={true}
+                                            isUrl={true}
+                                        />
+                                    </>
+                                }
+                            </>
+                        }   
+                    </DataEntryGroup>
+                    <DataEntryGroup name="Incomplete/Missing Data" collapsed={subcat==null || subcat!="3"}>
+                        <LogicalDataEntry
+                            slug='planning_missing_data'
+                            title={dataFields.planning_missing_data.title}
+                            tooltip={dataFields.planning_missing_data.tooltip}
+                            value={props.building.planning_missing_data}
+                            copy={props.copy}
+                            onChange={props.onChange}
+                            mode={props.mode}
+                        />
+                        <Verification
+                            slug="planning_missing_data"
+                            allow_verify={props.user !== undefined && props.building.planning_missing_data !== null && !props.edited}
+                            onVerify={props.onVerify}
+                            user_verified={props.user_verified.hasOwnProperty("planning_missing_data")}
+                            user_verified_as={props.user_verified.planning_missing_data}
+                            verified_count={props.building.verified.planning_missing_data}
+                        />
+                        {props.building.planning_missing_data == null ? <></> :
+                            <>
+                                <MultiDataEntry
+                                    title={dataFields.planning_missing_data_links.title}
+                                    slug="planning_missing_data_links"
+                                    value={props.building.planning_missing_data_links}
+                                    mode={props.mode}
+                                    copy={props.copy}
+                                    onChange={props.onChange}
+                                    tooltip={dataFields.planning_missing_data_links.tooltip}
+                                    placeholder="https://..."
+                                    editableEntries={true}
+                                    isUrl={true}
+                                />
+                            </>
+                        }
+                        <InfoBox>
+                            If you feel there are incorrect or missing data relating to this building please contact:  
+                            planningdata@London.gov.uk
+                        </InfoBox>
+                    </DataEntryGroup>
+                </DataEntryGroup>
+                <DataEntryGroup name="Past Applications" collapsed={subcat==null || subcat!="4"}>
                     <InfoBox>
-                        This section provides data on active applications. We define these as applications with any activity in the last year.
-                        <br />
-                        To comment on an application follow the application link if provided, or visit the relevant local authority's planning page.
+                        This section provides data on past applications where available from the GLA, including those with no decision in over a year
                     </InfoBox>
-                    {props.mapColourScale != "planning_applications_status_all" ?
-                        <button className={`map-switcher-inline disabled-state btn btn-outline btn-outline-dark key-button sub-subcategory-button`} onClick={switchToAllPlanningApplicationsMapStyle}>
-                            {'Click to view official planning application data'}
+                    {props.mapColourScale != "planning_applications_status_recent" ?
+                        <button className={`map-switcher-inline disabled-state btn btn-outline btn-outline-dark key-button no-left-margin`} onClick={switchToLastTwelveMonthsMapStyle}>
+                            {'Click to view planning applications from the last 12 months'}
+                        </button>
+                        :
+                        <></>
+                    }
+                    {props.mapColourScale != "planning_applications_status_very_recent" ?
+                        <button className={`map-switcher-inline disabled-state btn btn-outline btn-outline-dark key-button no-left-margin`} onClick={switchToLastThirtyDaysMapStyle}>
+                            {'Click to view planning applications from the last 30 days'}
                         </button>
                         :
                         <></>
                     }
                     {props.building.planning_data ?
                         <PlanningDataOfficialDataEntry  
-                            shownData={props.building.planning_data.filter(item => isArchived(item) == false)}
+                            shownData={props.building.planning_data.filter(item => isArchived(item))}
                             messageOnMissingData={
                                 props.building.planning_data.length > 0 ?
-                                    "Only past application data is currently available for this site"
+                                    "Only current application data is currently available for this site"
                                     :
                                     "No live planning data are currently available for this building from the Planning London Datahub."
                             }
@@ -109,272 +258,183 @@ const PlanningView: React.FunctionComponent<CategoryViewProps> = (props) => {
                     : <></>
                     }
                 </DataEntryGroup>
-                <DataEntryGroup name="Year of completion" collapsed={subcat==null || subcat!="2"}>
-                    <LogicalDataEntry
-                        slug='planning_crowdsourced_site_completion_status'
-                        title={dataFields.planning_crowdsourced_site_completion_status.title}
-                        tooltip={dataFields.planning_crowdsourced_site_completion_status.tooltip}
-                        value={props.building.planning_crowdsourced_site_completion_status}
-                        copy={props.copy}
-                        onChange={props.onChange}
+                <DataEntryGroup name="Possible Future Applications" collapsed={subcat==null || subcat!="5"}>
+                    <InfoBox type='info'>Click and colour buildings here if you think they may be subject to a future planning application involving demolition. To add your opinion on how well this building works, please also visit the <Link to={communityLinkUrl}>Community</Link> section.</InfoBox>
+                    {props.mapColourScale != "community_expected_planning_application_total" ?
+                        <button className={`map-switcher-inline disabled-state btn btn-outline btn-outline-dark key-button`} onClick={switchToExpectedApplicationMapStyle}>
+                            {'Click to view possible locations of future applications'}
+                        </button>
+                        :
+                        <></>
+                    }
+                    <UserOpinionEntry
+                        slug='community_expected_planning_application'
+                        title={buildingUserFields.community_expected_planning_application.title}
+                        tooltip={buildingUserFields.community_expected_planning_application.tooltip}
+                        userValue={props.building.community_expected_planning_application}
+                        onChange={props.onSaveChange}
                         mode={props.mode}
                     />
-                    <Verification
-                        slug="planning_crowdsourced_site_completion_status"
-                        allow_verify={props.user !== undefined && props.building.planning_crowdsourced_site_completion_status !== null && !props.edited}
-                        onVerify={props.onVerify}
-                        user_verified={props.user_verified.hasOwnProperty("planning_crowdsourced_site_completion_status")}
-                        user_verified_as={props.user_verified.planning_crowdsourced_site_completion_status}
-                        verified_count={props.building.verified.planning_crowdsourced_site_completion_status}
+                    <InfoBox type='warning'>
+                        Further improvements to this feature are currently being made.
+                    </InfoBox>
+                    <UserOpinionEntry
+                        slug='community_local_significance'
+                        title={buildingUserFields.community_local_significance.title}
+                        tooltip={buildingUserFields.community_local_significance.tooltip}
+                        userValue={props.building.community_local_significance}
+
+                        onChange={props.onSaveChange}
+                        mode={props.mode}
                     />
-                    {props.building.planning_crowdsourced_site_completion_status == null ? <></> :
-                        <>
-                            <NumericDataEntry
-                                title={dataFields.planning_crowdsourced_site_completion_year.title}
-                                slug="planning_crowdsourced_site_completion_year"
-                                value={props.building.planning_crowdsourced_site_completion_year}
-                                mode={props.mode}
-                                copy={props.copy}
-                                onChange={props.onChange}
-                                step={1}
-                                min={1}
-                                max={currentYear}
-                                tooltip={dataFields.planning_crowdsourced_site_completion_year.tooltip}
-                                />
-                            <Verification
-                                slug="planning_crowdsourced_site_completion_year"
-                                allow_verify={props.user !== undefined && props.building.planning_crowdsourced_site_completion_year !== null && !props.edited}
-                                onVerify={props.onVerify}
-                                user_verified={props.user_verified.hasOwnProperty("planning_crowdsourced_site_completion_year")}
-                                user_verified_as={props.user_verified.planning_crowdsourced_site_completion_year}
-                                verified_count={props.building.verified.planning_crowdsourced_site_completion_year}
-                                />
-                            <SelectDataEntry
-                                title={dataFields.planning_crowdsourced_site_completion_source_type.title}
-                                slug="planning_crowdsourced_site_completion_source_type"
-                                value={props.building.planning_crowdsourced_site_completion_source_type}
-                                mode={props.mode}
-                                copy={props.copy}
-                                onChange={props.onChange}
-                                tooltip={dataFields.planning_crowdsourced_site_completion_source_type.tooltip}
-                                options={dataFields.planning_crowdsourced_site_completion_source_type.items}
-                                placeholder={dataFields.planning_crowdsourced_site_completion_source_type.example}
-                            />
-                            {(props.building.planning_crowdsourced_site_completion_source_type == dataFields.planning_crowdsourced_site_completion_source_type.items[0] ||
-                                props.building.planning_crowdsourced_site_completion_source_type == dataFields.planning_crowdsourced_site_completion_source_type.items[1] ||
-                                props.building.planning_crowdsourced_site_completion_source_type == null) ? <></> :
-                                <>
-                                    <MultiDataEntry
-                                        title={dataFields.planning_crowdsourced_site_completion_source_links.title}
-                                        slug="planning_crowdsourced_site_completion_source_links"
-                                        value={props.building.planning_crowdsourced_site_completion_source_links}
-                                        mode={props.mode}
-                                        copy={props.copy}
-                                        onChange={props.onChange}
-                                        tooltip={dataFields.planning_crowdsourced_site_completion_source_links.tooltip}
-                                        placeholder="https://..."
-                                        editableEntries={true}
-                                        isUrl={true}
-                                    />
-                                </>
-                            }
-                        </>
-                    }   
+                    {(props.mapColourScale != "community_local_significance_total") ? 
+                        <button className={`map-switcher-inline enabled-state btn btn-outline btn-outline-dark key-button`} onClick={switchToLocalSignificanceMapStyle}>
+                            {'Click to show buildings of local interest.'}
+                        </button>
+                        :
+                        <></>
+                    }
                 </DataEntryGroup>
-                <DataEntryGroup name="Incomplete/missing data" collapsed={subcat==null || subcat!="3"}>
+                <DataEntryGroup name="Planning Zones" collapsed={subcat==null || subcat!="6"}>
+                    <InfoBox>
+                        To view planning zone data for London click the buttons below. You may need to <u>zoom out</u>.
+                        Information on whether a specific building is in a zone will be added automatically in future.
+                    </InfoBox>
+                    <div className={`alert alert-dark`} role="alert" style={{ fontSize: 13, backgroundColor: "#f6f8f9" }}>
+                        <i>
+                            Data in this section comes from <a href="https://www.london.gov.uk/programmes-strategies/planning/digital-planning/planning-london-datahub">the Greater London Authority's Planning London Datahub</a>. Please check the original GLA source when using for planning purposes.
+                            <br />
+                            Specific sources are mentioned in the footer of map for currently enabled layers.
+                        </i>
+                    </div>
                     <LogicalDataEntry
-                        slug='planning_missing_data'
-                        title={dataFields.planning_missing_data.title}
-                        tooltip={dataFields.planning_missing_data.tooltip}
-                        value={props.building.planning_missing_data}
+                        slug='planning_housing_zone'
+                        title={dataFields.planning_housing_zone.title}
+                        tooltip={dataFields.planning_housing_zone.tooltip}
+                        value={props.building.planning_housing_zone}
                         copy={props.copy}
                         onChange={props.onChange}
                         mode={props.mode}
+                        disabled={true}
+                    />
+                    <button className={`map-switcher-inline ${housing}-state btn btn-outline btn-outline-dark ${darkLightTheme}`} onClick={housingSwitchOnClick}>
+                        {(housing === 'enabled')? 'Click to hide Housing Zones' : 'Click to see Housing Zones mapped'}
+                    </button>
+                    <LogicalDataEntry
+                        slug='planning_enterprise_zone'
+                        title={dataFields.planning_enterprise_zone.title}
+                        tooltip={dataFields.planning_enterprise_zone.tooltip}
+                        value={props.building.planning_enterprise_zone}
+                        copy={props.copy}
+                        onChange={props.onChange}
+                        mode={props.mode}
+                        disabled={true}
+                    />
+                    <button className={`map-switcher-inline ${creative}-state btn btn-outline btn-outline-dark ${darkLightTheme}`} onClick={creativeSwitchOnClick}>
+                        {(creative === 'enabled')? 'Click to hide Creative Enterprise Zones' : 'Click to see Creative Enterprise Zones'}
+                    </button>
+                    <LogicalDataEntry
+                        slug='planning_protected_vista'
+                        title={dataFields.planning_protected_vista.title}
+                        tooltip={dataFields.planning_protected_vista.tooltip}
+                        value={props.building.planning_protected_vista}
+                        copy={props.copy}
+                        onChange={props.onChange}
+                        mode={props.mode}
+                        disabled={true}
+                    />
+                    <button className={`map-switcher-inline ${vista}-state btn btn-outline btn-outline-dark ${darkLightTheme}`} onClick={vistaSwitchOnClick}>
+                        {(vista === 'enabled')? 'Click to hide Protected Vistas' : 'Click to see Protected Vistas'}
+                    </button>
+                    {/*
+                        <DataEntry
+                        title={dataFields.planning_glher_url.title}
+                        slug="planning_glher_url"
+                        value={props.building.planning_glher_url}
+                        mode={props.mode}
+                        copy={props.copy}
+                        onChange={props.onChange}
+                        isUrl={true}
+                        placeholder="Please add relevant link here"
+                        />
+                    <Verification
+                        slug="planning_glher_url"
+                        allow_verify={props.user !== undefined && props.building.planning_glher_url !== null && !props.edited}
+                        onVerify={props.onVerify}
+                        user_verified={props.user_verified.hasOwnProperty("planning_glher_url")}
+                        user_verified_as={props.user_verified.planning_glher_url}
+                        verified_count={props.building.verified.planning_glher_url}
+                        />
+                    */}
+                </DataEntryGroup>    
+                <DataEntryGroup name="Land Ownership Type" collapsed={subcat==null || subcat!="8"}>
+                    <InfoBox>
+                        This section is designed to provide information on land parcels and their ownership type. Can you help us collect this information?
+                    </InfoBox>
+                    <SelectDataEntry
+                        slug='community_public_ownership'
+                        title={dataFields.community_public_ownership.title}
+                        value={props.building.community_public_ownership}
+                        options={dataFields.community_public_ownership.items}
+                        tooltip={dataFields.community_public_ownership.tooltip}
+                        onChange={props.onChange}
+                        mode={props.mode}
+                        copy={props.copy}
                     />
                     <Verification
-                        slug="planning_missing_data"
-                        allow_verify={props.user !== undefined && props.building.planning_missing_data !== null && !props.edited}
+                        slug="community_public_ownership"
+                        allow_verify={props.user !== undefined && props.building.community_public_ownership !== null && !props.edited}
                         onVerify={props.onVerify}
-                        user_verified={props.user_verified.hasOwnProperty("planning_missing_data")}
-                        user_verified_as={props.user_verified.planning_missing_data}
-                        verified_count={props.building.verified.planning_missing_data}
+                        user_verified={props.user_verified.hasOwnProperty("community_public_ownership")}
+                        user_verified_as={props.user_verified.community_public_ownership}
+                        verified_count={props.building.verified.community_public_ownership}
                     />
-                    {props.building.planning_missing_data == null ? <></> :
+                    <SelectDataEntry
+                        title={dataFields.community_public_ownership_source_type.title}
+                        slug="community_public_ownership_source_type"
+                        value={props.building.community_public_ownership_source_type}
+                        mode={props.mode}
+                        copy={props.copy}
+                        onChange={props.onChange}
+                        tooltip={dataFields.community_public_ownership_source_type.tooltip}
+                        options={dataFields.community_public_ownership_source_type.items}
+                        placeholder={dataFields.community_public_ownership_source_type.example}
+                    />
+                    {(props.building.community_public_ownership_source_type == dataFields.community_public_ownership_source_type.items[0] ||
+                        props.building.community_public_ownership_source_type == dataFields.community_public_ownership_source_type.items[1] ||
+                        props.building.community_public_ownership_source_type == null) ? <></> :
                         <>
                             <MultiDataEntry
-                                title={dataFields.planning_missing_data_links.title}
-                                slug="planning_missing_data_links"
-                                value={props.building.planning_missing_data_links}
+                                slug='community_public_ownership_sources'
+                                title={dataFields.community_public_ownership_sources.title}
+                                tooltip={dataFields.community_public_ownership_sources.tooltip}
+                                isUrl={true}
+                                placeholder={'https://...'}
+                                editableEntries={true}
+                                value={props.building.community_public_ownership_sources}
+                                onChange={props.onChange}
                                 mode={props.mode}
                                 copy={props.copy}
-                                onChange={props.onChange}
-                                tooltip={dataFields.planning_missing_data_links.tooltip}
-                                placeholder="https://..."
-                                editableEntries={true}
-                                isUrl={true}
                             />
                         </>
                     }
-                    <InfoBox>
-                        If you feel there are incorrect or missing data relating to this building please contact:  
-                        planningdata@London.gov.uk
-                    </InfoBox>
+                    <hr/>
+                    <DataEntry
+                        title={dataFields.size_parcel_geometry.title}
+                        slug="size_parcel_geometry"
+                        value={props.building.size_parcel_geometry}
+                        mode={props.mode}
+                        onChange={props.onChange}
+                        tooltip={dataFields.size_parcel_geometry.tooltip}
+                        placeholder="https://..."
+                        isUrl={true}
+                    />
+                    <button className={`map-switcher-inline ${parcel}-state btn btn-outline btn-outline-dark ${darkLightTheme}`} onClick={parcelSwitchOnClick}>
+                        {(parcel === 'enabled')? 'Click to hide sample land parcel data' : 'Click to show sample land parcel data'}
+                    </button>
                 </DataEntryGroup>
             </DataEntryGroup>
-            <DataEntryGroup name="Past applications" collapsed={subcat==null || subcat!="4"}>
-                <InfoBox>
-                    This section provides data on past applications where available from the GLA, including those with no decision in over a year
-                </InfoBox>
-                {props.mapColourScale != "planning_applications_status_recent" ?
-                    <button className={`map-switcher-inline disabled-state btn btn-outline btn-outline-dark key-button no-left-margin`} onClick={switchToLastTwelveMonthsMapStyle}>
-                        {'Click to view planning applications from the last 12 months'}
-                    </button>
-                    :
-                    <></>
-                }
-                {props.mapColourScale != "planning_applications_status_very_recent" ?
-                    <button className={`map-switcher-inline disabled-state btn btn-outline btn-outline-dark key-button no-left-margin`} onClick={switchToLastThirtyDaysMapStyle}>
-                        {'Click to view planning applications from the last 30 days'}
-                    </button>
-                    :
-                    <></>
-                }
-                {props.building.planning_data ?
-                    <PlanningDataOfficialDataEntry  
-                        shownData={props.building.planning_data.filter(item => isArchived(item))}
-                        messageOnMissingData={
-                            props.building.planning_data.length > 0 ?
-                                "Only current application data is currently available for this site"
-                                :
-                                "No live planning data are currently available for this building from the Planning London Datahub."
-                        }
-                    />
-                : <></>
-                }
-            </DataEntryGroup>
-            <DataEntryGroup name="Possible future applications" collapsed={subcat==null || subcat!="5"}>
-                <InfoBox type='info'>Click and colour buildings here if you think they may be subject to a future planning application involving demolition. To add your opinion on how well this building works, please also visit the <Link to={communityLinkUrl}>Community</Link> section.</InfoBox>
-                {props.mapColourScale != "community_expected_planning_application_total" ?
-                    <button className={`map-switcher-inline disabled-state btn btn-outline btn-outline-dark key-button`} onClick={switchToExpectedApplicationMapStyle}>
-                        {'Click to view possible locations of future applications'}
-                    </button>
-                    :
-                    <></>
-                }
-                <UserOpinionEntry
-                    slug='community_expected_planning_application'
-                    title={buildingUserFields.community_expected_planning_application.title}
-                    tooltip={buildingUserFields.community_expected_planning_application.tooltip}
-                    userValue={props.building.community_expected_planning_application}
-                    onChange={props.onSaveChange}
-                    mode={props.mode}
-                />
-                <InfoBox type='warning'>
-                    Further improvements to this feature are currently being made.
-                </InfoBox>
-                <UserOpinionEntry
-                    slug='community_local_significance'
-                    title={buildingUserFields.community_local_significance.title}
-                    tooltip={buildingUserFields.community_local_significance.tooltip}
-                    userValue={props.building.community_local_significance}
-
-                    onChange={props.onSaveChange}
-                    mode={props.mode}
-                />
-                {(props.mapColourScale != "community_local_significance_total") ? 
-                    <button className={`map-switcher-inline enabled-state btn btn-outline btn-outline-dark key-button`} onClick={switchToLocalSignificanceMapStyle}>
-                        {'Click to show buildings of local interest.'}
-                    </button>
-                    :
-                    <></>
-                }
-            </DataEntryGroup>
-            <DataEntryGroup name="Planning zones" collapsed={subcat==null || subcat!="6"}>
-                <InfoBox>
-                    To view planning zone data for London click the buttons below. You may need to <u>zoom out</u>.
-                    Information on whether a specific building is in a zone will be added automatically in future.
-                </InfoBox>
-                <div className={`alert alert-dark`} role="alert" style={{ fontSize: 13, backgroundColor: "#f6f8f9" }}>
-                    <i>
-                        Data in this section comes from <a href="https://www.london.gov.uk/programmes-strategies/planning/digital-planning/planning-london-datahub">the Greater London Authority's Planning London Datahub</a>. Please check the original GLA source when using for planning purposes.
-                        <br />
-                        Specific sources are mentioned in the footer of map for currently enabled layers.
-                    </i>
-                </div>
-                <LogicalDataEntry
-                    slug='planning_flood_zone'
-                    title={dataFields.planning_flood_zone.title}
-                    tooltip={dataFields.planning_flood_zone.tooltip}
-                    value={props.building.planning_flood_zone}
-                    copy={props.copy}
-                    onChange={props.onChange}
-                    mode={props.mode}
-                    disabled={true}
-                />
-                <button className={`map-switcher-inline ${flood}-state btn btn-outline btn-outline-dark ${darkLightTheme}`} onClick={floodSwitchOnClick}>
-                    {(flood === 'enabled')? 'Click to hide Flood Zones' : 'Click to see Flood Zones mapped'}
-                </button>
-                <LogicalDataEntry
-                    slug='planning_housing_zone'
-                    title={dataFields.planning_housing_zone.title}
-                    tooltip={dataFields.planning_housing_zone.tooltip}
-                    value={props.building.planning_housing_zone}
-                    copy={props.copy}
-                    onChange={props.onChange}
-                    mode={props.mode}
-                    disabled={true}
-                />
-                <button className={`map-switcher-inline ${housing}-state btn btn-outline btn-outline-dark ${darkLightTheme}`} onClick={housingSwitchOnClick}>
-                    {(housing === 'enabled')? 'Click to hide Housing Zones' : 'Click to see Housing Zones mapped'}
-                </button>
-                <LogicalDataEntry
-                    slug='planning_enterprise_zone'
-                    title={dataFields.planning_enterprise_zone.title}
-                    tooltip={dataFields.planning_enterprise_zone.tooltip}
-                    value={props.building.planning_enterprise_zone}
-                    copy={props.copy}
-                    onChange={props.onChange}
-                    mode={props.mode}
-                    disabled={true}
-                />
-                <button className={`map-switcher-inline ${creative}-state btn btn-outline btn-outline-dark ${darkLightTheme}`} onClick={creativeSwitchOnClick}>
-                    {(creative === 'enabled')? 'Click to hide Creative Enterprise Zones' : 'Click to see Creative Enterprise Zones'}
-                </button>
-                <LogicalDataEntry
-                    slug='planning_protected_vista'
-                    title={dataFields.planning_protected_vista.title}
-                    tooltip={dataFields.planning_protected_vista.tooltip}
-                    value={props.building.planning_protected_vista}
-                    copy={props.copy}
-                    onChange={props.onChange}
-                    mode={props.mode}
-                    disabled={true}
-                />
-                <button className={`map-switcher-inline ${vista}-state btn btn-outline btn-outline-dark ${darkLightTheme}`} onClick={vistaSwitchOnClick}>
-                    {(vista === 'enabled')? 'Click to hide Protected Vistas' : 'Click to see Protected Vistas'}
-                </button>
-                {/*
-                    <DataEntry
-                    title={dataFields.planning_glher_url.title}
-                    slug="planning_glher_url"
-                    value={props.building.planning_glher_url}
-                    mode={props.mode}
-                    copy={props.copy}
-                    onChange={props.onChange}
-                    isUrl={true}
-                    placeholder="Please add relevant link here"
-                    />
-                <Verification
-                    slug="planning_glher_url"
-                    allow_verify={props.user !== undefined && props.building.planning_glher_url !== null && !props.edited}
-                    onVerify={props.onVerify}
-                    user_verified={props.user_verified.hasOwnProperty("planning_glher_url")}
-                    user_verified_as={props.user_verified.planning_glher_url}
-                    verified_count={props.building.verified.planning_glher_url}
-                    />
-                */}
-            </DataEntryGroup>
-            <DataEntryGroup name="Heritage assets and building protection" collapsed={subcat==null || subcat!="7"}>
+            <DataEntryGroup name="Heritage Assets & Building Protection" collapsed={subcat==null || subcat!="7"}>
                 <InfoBox>
                 Help us produce the most accurate map possible for London's designated/protected buildings. Please add data if missing or click "Verify" where entries are correct.
                 </InfoBox>
@@ -736,76 +796,10 @@ const PlanningView: React.FunctionComponent<CategoryViewProps> = (props) => {
                             />
                     </>
                 }
-            </DataEntryGroup>      
-            <DataEntryGroup name="Land ownership type" collapsed={subcat==null || subcat!="8"}>
-                <InfoBox>
-                    This section is designed to provide information on land parcels and their ownership type. Can you help us collect this information?
-                </InfoBox>
-                <SelectDataEntry
-                    slug='community_public_ownership'
-                    title={dataFields.community_public_ownership.title}
-                    value={props.building.community_public_ownership}
-                    options={dataFields.community_public_ownership.items}
-                    tooltip={dataFields.community_public_ownership.tooltip}
-                    onChange={props.onChange}
-                    mode={props.mode}
-                    copy={props.copy}
-                />
-                <Verification
-                    slug="community_public_ownership"
-                    allow_verify={props.user !== undefined && props.building.community_public_ownership !== null && !props.edited}
-                    onVerify={props.onVerify}
-                    user_verified={props.user_verified.hasOwnProperty("community_public_ownership")}
-                    user_verified_as={props.user_verified.community_public_ownership}
-                    verified_count={props.building.verified.community_public_ownership}
-                />
-                <SelectDataEntry
-                    title={dataFields.community_public_ownership_source_type.title}
-                    slug="community_public_ownership_source_type"
-                    value={props.building.community_public_ownership_source_type}
-                    mode={props.mode}
-                    copy={props.copy}
-                    onChange={props.onChange}
-                    tooltip={dataFields.community_public_ownership_source_type.tooltip}
-                    options={dataFields.community_public_ownership_source_type.items}
-                    placeholder={dataFields.community_public_ownership_source_type.example}
-                />
-                {(props.building.community_public_ownership_source_type == dataFields.community_public_ownership_source_type.items[0] ||
-                    props.building.community_public_ownership_source_type == dataFields.community_public_ownership_source_type.items[1] ||
-                    props.building.community_public_ownership_source_type == null) ? <></> :
-                    <>
-                        <MultiDataEntry
-                            slug='community_public_ownership_sources'
-                            title={dataFields.community_public_ownership_sources.title}
-                            tooltip={dataFields.community_public_ownership_sources.tooltip}
-                            isUrl={true}
-                            placeholder={'https://...'}
-                            editableEntries={true}
-                            value={props.building.community_public_ownership_sources}
-                            onChange={props.onChange}
-                            mode={props.mode}
-                            copy={props.copy}
-                        />
-                    </>
-                }
-                <hr/>
-                <DataEntry
-                    title={dataFields.size_parcel_geometry.title}
-                    slug="size_parcel_geometry"
-                    value={props.building.size_parcel_geometry}
-                    mode={props.mode}
-                    onChange={props.onChange}
-                    tooltip={dataFields.size_parcel_geometry.tooltip}
-                    placeholder="https://..."
-                    isUrl={true}
-                />
-                <button className={`map-switcher-inline ${parcel}-state btn btn-outline btn-outline-dark ${darkLightTheme}`} onClick={parcelSwitchOnClick}>
-                    {(parcel === 'enabled')? 'Click to hide sample land parcel data' : 'Click to show sample land parcel data'}
-                </button>
-            </DataEntryGroup>
+            </DataEntryGroup>  
         </Fragment>
     );
 };
-const PlanningContainer = withCopyEdit(PlanningView);
+const PlanningConservationContainer = withCopyEdit(PlanningConservationView);
 
-export default PlanningContainer;
+export default PlanningConservationContainer;

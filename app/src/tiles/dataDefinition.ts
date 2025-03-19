@@ -43,6 +43,34 @@ const LAYER_QUERIES = {
         FROM
             buildings
         WHERE date_year IS NOT NULL`,
+    date_year_completed: `
+        SELECT
+            geometry_id,
+            date_year_completed
+        FROM
+            buildings
+        WHERE date_year_completed IS NOT NULL`,
+    cladding_year: `
+        SELECT
+            geometry_id,
+            age_cladding_date::smallint AS date_year
+        FROM
+            buildings
+        WHERE age_cladding_date IS NOT NULL`,
+    extension_year: `
+        SELECT
+            geometry_id,
+            age_extension_date::smallint AS date_year
+        FROM
+            buildings
+        WHERE age_extension_date IS NOT NULL`,
+    retrofit_year: `
+        SELECT
+            geometry_id,
+            age_retrofit_date::smallint AS date_year
+        FROM
+            buildings
+        WHERE age_retrofit_date IS NOT NULL`,
     size_storeys: `
         SELECT
             geometry_id,

@@ -12,9 +12,9 @@ import { MultiDataEntry } from '../data-components/multi-data-entry/multi-data-e
 import DataPickerDateEntry from '../data-components/date-picker-data-entry';
 
 /**
-* Dynamics view/edit section
+* Disaster management view/edit section
 */
-const ResilienceView: React.FunctionComponent<CategoryViewProps> = (props) => {
+const DisasterManagementView: React.FunctionComponent<CategoryViewProps> = (props) => {
     
     const queryParameters = new URLSearchParams(window.location.search);
     const subcat = queryParameters.get("sc");
@@ -29,7 +29,7 @@ const ResilienceView: React.FunctionComponent<CategoryViewProps> = (props) => {
     }
 
     return (<>
-        <DataEntryGroup name="Disaster management tool" collapsed={subcat==null || subcat!="1"}>
+        <DataEntryGroup name="Disaster Management Tool" collapsed={subcat==null || subcat!="1"}>
             <div className={`alert alert-dark`} role="alert" style={{ fontSize: 13, backgroundColor: "#f6f8f9" }}>
                 <i>
                     This feature is designed as an assessment tool to help communities capture data on the state of buildings following major disasters. 
@@ -127,7 +127,7 @@ const ResilienceView: React.FunctionComponent<CategoryViewProps> = (props) => {
                     </>
                 }
         </DataEntryGroup>
-        <DataEntryGroup name="Resilience indicators and risk assessment" collapsed={subcat==null || subcat!="2"}>
+        <DataEntryGroup name="Resilience Indicators & Risk Assessment" collapsed={subcat==null || subcat!="2"}>
             <InfoBox type='warning'>
                 This section is under development.
             </InfoBox>
@@ -214,6 +214,6 @@ const ResilienceView: React.FunctionComponent<CategoryViewProps> = (props) => {
     </>)
 };
 
-const ResilienceContainer = withCopyEdit(ResilienceView);
+const DisasterManagementContainer = withCopyEdit(DisasterManagementView);
 
-export default ResilienceContainer;
+export default DisasterManagementContainer;

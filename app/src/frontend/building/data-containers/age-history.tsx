@@ -1,29 +1,25 @@
 import React, { Fragment } from 'react';
 
-import '../../map/map-button.css';
 import { commonSourceTypes, dataFields } from '../../config/data-fields-config';
-import { MultiDataEntry } from '../data-components/multi-data-entry/multi-data-entry';
+import DataEntry from '../data-components/data-entry';
+import SelectDataEntry from '../data-components/select-data-entry';
+import withCopyEdit from '../data-container';
+import Verification from '../data-components/verification';
+import { CategoryViewProps } from './category-view-props';
+import InfoBox from '../../components/info-box';
 import { DataEntryGroup } from '../data-components/data-entry-group';
+import { MultiDataEntry } from '../data-components/multi-data-entry/multi-data-entry';
+import { LogicalDataEntry } from '../data-components/logical-data-entry/logical-data-entry';
+import NumericDataEntry from '../data-components/numeric-data-entry';
+import { useDisplayPreferences } from '../../displayPreferences-context';
 import { DynamicsBuildingPane, DynamicsDataEntry } from './dynamics/dynamics-data-entry';
 import { FieldRow } from '../data-components/field-row';
-import { Link } from 'react-router-dom';
-import { Category } from '../../config/categories-config';
-import NumericDataEntry from '../data-components/numeric-data-entry';
-import SelectDataEntry from '../data-components/select-data-entry';
-import Verification from '../data-components/verification';
-import YearDataEntry from '../data-components/year-data-entry';
-import withCopyEdit from '../data-container';
-import DataEntry from '../data-components/data-entry';
-import InfoBox from '../../components/info-box';
-
-import { CategoryViewProps } from './category-view-props';
-import { LogicalDataEntry } from '../data-components/logical-data-entry/logical-data-entry';
-import { useDisplayPreferences } from '../../displayPreferences-context';
+import { MapTileset } from '../../config/tileserver-config';
 
 /**
-* Age view/edit section
+* Age & History view/edit section
 */
-const AgeView: React.FunctionComponent<CategoryViewProps> = (props) => {
+const AgeHistoryView: React.FunctionComponent<CategoryViewProps> = (props) => {
     const currentYear = new Date().getFullYear();
 
     const building = props.building;
@@ -53,22 +49,43 @@ const AgeView: React.FunctionComponent<CategoryViewProps> = (props) => {
         }
     }
 
-    const switchToAgeMapStyle = (e) => {
-        e.preventDefault();
-
-        if (historicData === 'enabled') {
-            historicDataSwitchOnClick(e);
-        }
-        if (historicMap === 'enabled') {
-            historicMapSwitchOnClick(e);
-        }
-
-        props.onMapColourScale('date_year');
-    }
-
-    const switchToStylePeriodMapStyle = (e) => {
+    const switchToHistoricalPeriodMapStyle = (e) => {
         e.preventDefault();
         props.onMapColourScale('typology_style_period')
+    }
+
+    const switchToAgeMapStyle = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        switchToMapStyleHideHistoricMaps(event, 'date_year')
+    }
+
+    const switchToAgeCladdingMapStyle = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        switchToMapStyleHideHistoricMaps(event, 'cladding_year')
+    }
+
+    const switchToAgeExtensionMapStyle = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        switchToMapStyleHideHistoricMaps(event, 'extension_year')
+    }
+
+    const switchToAgeRetrofitMapStyle = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        switchToMapStyleHideHistoricMaps(event, 'retrofit_year')
+    }
+
+    const switchToMapStyleHideHistoricMaps = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>, map_style: MapTileset) => {
+        event.preventDefault();
+        if (historicData === 'enabled') {
+            historicDataSwitchOnClick(event);
+        }
+        if (historicMap === 'enabled') {
+            historicMapSwitchOnClick(event);
+        }
+        props.onMapColourScale(map_style);
+    }
+
+    let construction_length = null;
+
+    if (props.building.date_year != null && props.building.date_year_completed != null) {
+        construction_length = props.building.date_year_completed - props.building.date_year;
+        construction_length = Math.max(construction_length, 1);
     }
 
     const queryParameters = new URLSearchParams(window.location.search);
@@ -76,10 +93,10 @@ const AgeView: React.FunctionComponent<CategoryViewProps> = (props) => {
 
     return (
         <Fragment>
-            <DataEntryGroup name="Architectural style/historial period" collapsed={subcat==null || subcat!="2"}>
+            <DataEntryGroup name="Historical Period" collapsed={subcat==null || subcat!="2"}>
                 {(props.mapColourScale != "typology_style_period") ? 
-                    <button className={`map-switcher-inline enabled-state btn btn-outline btn-outline-dark key-button`} onClick={switchToStylePeriodMapStyle}>
-                        Click to show architectural style.
+                    <button className={`map-switcher-inline enabled-state btn btn-outline btn-outline-dark key-button`} onClick={switchToHistoricalPeriodMapStyle}>
+                        Click to show historical period.
                     </button>
                 :
                     <></>
@@ -132,7 +149,7 @@ const AgeView: React.FunctionComponent<CategoryViewProps> = (props) => {
                     </>
                 }
             </DataEntryGroup>
-            <DataEntryGroup name="Building age/construction date" collapsed={subcat==null || subcat!="1"}>
+            <DataEntryGroup name="Building Age/Construction Date" collapsed={subcat==null || subcat!="1"}>
                 {(props.mapColourScale != "date_year") ? 
                         <button className={`map-switcher-inline enabled-state btn btn-outline btn-outline-dark key-button`} onClick={switchToAgeMapStyle}>
                             Click to show building age.
@@ -140,32 +157,59 @@ const AgeView: React.FunctionComponent<CategoryViewProps> = (props) => {
                 :
                     <></>
                 }
-                <YearDataEntry
-                    year={props.building.date_year}
-                    upper={props.building.date_upper}
-                    lower={props.building.date_lower}
+                <NumericDataEntry
+                    title={dataFields.date_year.title}
+                    slug="date_year"
+                    value={props.building.date_year}
                     mode={props.mode}
                     copy={props.copy}
                     onChange={props.onChange}
-
+                    step={1}
+                    min={1}
+                    max={props.building.date_year_completed}
+                    tooltip={dataFields.date_year.tooltip}
+                    />
+                <Verification
+                    slug="date_year"
                     allow_verify={props.user !== undefined && props.building.date_year !== null && !props.edited}
                     onVerify={props.onVerify}
                     user_verified={props.user_verified.hasOwnProperty("date_year")}
                     user_verified_as={props.user_verified.date_year}
                     verified_count={props.building.verified.date_year}
-                    
-                    allow_verify_upper={props.user !== undefined && props.building.date_upper !== null && !props.edited}
-                    onVerify_upper={props.onVerify}
-                    user_verified_upper={props.user_verified.hasOwnProperty("date_upper")}
-                    user_verified_as_upper={props.user_verified.date_upper}
-                    verified_count_upper={props.building.verified.date_upper}
-                    
-                    allow_verify_lower={props.user !== undefined && props.building.date_lower !== null && !props.edited}
-                    onVerify_lower={props.onVerify}
-                    user_verified_lower={props.user_verified.hasOwnProperty("date_lower")}
-                    user_verified_as_lower={props.user_verified.date_lower}
-                    verified_count_lower={props.building.verified.date_lower}
                     />
+                <NumericDataEntry
+                    title={dataFields.date_year_completed.title}
+                    slug="date_year_completed"
+                    value={props.building.date_year_completed}
+                    mode={props.mode}
+                    copy={props.copy}
+                    onChange={props.onChange}
+                    step={1}
+                    min={props.building.date_year}
+                    max={currentYear}
+                    tooltip={dataFields.date_year_completed.tooltip}
+                    />
+                <Verification
+                    slug="date_year_completed"
+                    allow_verify={props.user !== undefined && props.building.date_year_completed !== null && !props.edited}
+                    onVerify={props.onVerify}
+                    user_verified={props.user_verified.hasOwnProperty("date_year_completed")}
+                    user_verified_as={props.user_verified.date_year_completed}
+                    verified_count={props.building.verified.date_year_completed}
+                    />
+                <NumericDataEntry
+                    title="Estimated duration of construction (years)"
+                    slug="size_total_floors"
+                    value={construction_length}
+                    mode={props.mode}
+                    copy={props.copy}
+                    tooltip="Length of building construction (calculated from above values)."
+                    onChange={props.onChange}
+                    step={1}
+                    min={0}
+                    disabled={true}
+                    />
+                <hr/>
                 <NumericDataEntry
                     title={dataFields.facade_year.title}
                     slug="facade_year"
@@ -216,38 +260,15 @@ const AgeView: React.FunctionComponent<CategoryViewProps> = (props) => {
                         />
                     </>
                 }
-                <hr/>
-                <SelectDataEntry
-                    title={dataFields.date_source.title}
-                    slug="date_source"
-                    value={props.building.date_source}
-                    mode={props.mode}
-                    copy={props.copy}
-                    onChange={props.onChange}
-                    tooltip={dataFields.date_source.tooltip}
-                    options={dataFields.date_source.items}
-                    placeholder={dataFields.date_source.example}
-                    />
-                {(props.building.date_source == dataFields.date_source.items[0] ||
-                    props.building.date_source == dataFields.date_source.items[1] ||
-                    props.building.date_source == null) ? <></> :
-                    <>
-                        <MultiDataEntry
-                            title={dataFields.date_link.title}
-                            slug="date_link"
-                            value={props.building.date_link}
-                            mode={props.mode}
-                            copy={props.copy}
-                            onChange={props.onChange}
-                            tooltip={dataFields.date_link.tooltip}
-                            placeholder="https://..."
-                            editableEntries={true}
-                            isUrl={true}
-                        />
-                    </>
-                }
             </DataEntryGroup>
-            <DataEntryGroup name="Cladding, extensions and retrofits" collapsed={subcat==null || subcat!="3"}>
+            <DataEntryGroup name="Cladding, Extensions & Retrofits" collapsed={subcat==null || subcat!="3"}>
+                {(props.mapColourScale != "cladding_year") ? 
+                        <button className={`map-switcher-inline enabled-state btn btn-outline btn-outline-dark key-button`} onClick={switchToAgeCladdingMapStyle}>
+                            Click to show cladding date.
+                        </button>
+                :
+                    <></>
+                }
                 <NumericDataEntry
                     slug='age_cladding_date'
                     title={dataFields.age_cladding_date.title}
@@ -258,7 +279,7 @@ const AgeView: React.FunctionComponent<CategoryViewProps> = (props) => {
                     step={1}
                     min={1}
                     max={currentYear}
-                    tooltip={dataFields.extension_year.tooltip}
+                    tooltip={dataFields.age_cladding_date.tooltip}
                     />
                 <Verification
                     slug="age_cladding_date"
@@ -298,6 +319,13 @@ const AgeView: React.FunctionComponent<CategoryViewProps> = (props) => {
                     </>
                 }
                 <hr/>
+                {(props.mapColourScale != "extension_year") ? 
+                        <button className={`map-switcher-inline enabled-state btn btn-outline btn-outline-dark key-button`} onClick={switchToAgeExtensionMapStyle}>
+                            Click to show extension date.
+                        </button>
+                :
+                    <></>
+                }
                 <NumericDataEntry
                     slug='age_extension_date'
                     title={dataFields.age_extension_date.title}
@@ -308,7 +336,7 @@ const AgeView: React.FunctionComponent<CategoryViewProps> = (props) => {
                     step={1}
                     min={1}
                     max={currentYear}
-                    tooltip={dataFields.extension_year.tooltip}
+                    tooltip={dataFields.age_extension_date.tooltip}
                     />
                 <Verification
                     slug="age_extension_date"
@@ -348,6 +376,13 @@ const AgeView: React.FunctionComponent<CategoryViewProps> = (props) => {
                     </>
                 }
                 <hr/>
+                {(props.mapColourScale != "retrofit_year") ? 
+                        <button className={`map-switcher-inline enabled-state btn btn-outline btn-outline-dark key-button`} onClick={switchToAgeRetrofitMapStyle}>
+                            Click to show retrofit date.
+                        </button>
+                :
+                    <></>
+                }
                 <NumericDataEntry
                     slug='age_retrofit_date'
                     title={dataFields.age_retrofit_date.title}
@@ -358,7 +393,7 @@ const AgeView: React.FunctionComponent<CategoryViewProps> = (props) => {
                     step={1}
                     min={1}
                     max={currentYear}
-                    tooltip={dataFields.extension_year.tooltip}
+                    tooltip={dataFields.age_retrofit_date.tooltip}
                     />
                 <Verification
                     slug="age_retrofit_date"
@@ -398,8 +433,8 @@ const AgeView: React.FunctionComponent<CategoryViewProps> = (props) => {
                     </>
                 }
             </DataEntryGroup>
-            <DataEntryGroup name="Lifespan and site history" collapsed={subcat==null || subcat!="4"}>
-                <DataEntryGroup name="Constructions and demolitions on this site" collapsed={subcat==null || subcat!="4"}>
+            <DataEntryGroup name="Lifespan & Site History" collapsed={subcat==null || subcat!="4"}>
+                <DataEntryGroup name="Constructions & Demolitions on this Site" collapsed={subcat==null || subcat!="4"}>
                     <DynamicsBuildingPane>
                         <label>Current building (building age data editable above)</label>
                         <FieldRow>
@@ -480,12 +515,8 @@ const AgeView: React.FunctionComponent<CategoryViewProps> = (props) => {
                             </>
                     }
                 </DataEntryGroup>
-                <InfoBox type='warning'>
-                    This section is under development in collaboration with the historic environment sector.
-                    Please let us know your suggestions on the <a href="https://discuss.colouring.london/t/dynamics-category-discussion/107">discussion forum</a>! (external link - save your edits first)
-                </InfoBox>
             </DataEntryGroup>
-            <DataEntryGroup name="Survival tracking" collapsed={subcat==null || subcat!="5"}>
+            <DataEntryGroup name="Survival Tracking" collapsed={subcat==null || subcat!="5"}>
                 <div className={`alert alert-dark`} role="alert" style={{ fontSize: 13, backgroundColor: "#f6f8f9" }}>
                     <i>
                         Can you help us create a map that shows how many buildings in this area have survived since the 1890s? 
@@ -549,10 +580,7 @@ const AgeView: React.FunctionComponent<CategoryViewProps> = (props) => {
                     </>
                 }
             </DataEntryGroup>
-            <DataEntryGroup name="Historical map data options" collapsed={subcat==null || subcat!="6"}>
-                <InfoBox type='warning'>
-                    This section is under development
-                </InfoBox>
+            <DataEntryGroup name="Historical Map Data Options" collapsed={subcat==null || subcat!="6"}>
                 <div className={`alert alert-dark`} role="alert" style={{ fontSize: 13, backgroundColor: "#f6f8f9" }}>
                     <i>
                         This section provides links to open digitised historical maps/mapping data that we are using in the Colouring Cities platform.
@@ -586,6 +614,7 @@ const AgeView: React.FunctionComponent<CategoryViewProps> = (props) => {
         </Fragment>
     );
 };
-const AgeContainer = withCopyEdit(AgeView);
 
-export default AgeContainer;
+const AgeHistoryContainer = withCopyEdit(AgeHistoryView);
+
+export default AgeHistoryContainer;

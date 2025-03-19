@@ -39,6 +39,7 @@ import { HistoricMapSwitcher } from './historic-map-switcher';
 import { VistaSwitcher } from './vista-switcher';
 import { CreativeSwitcher } from './creative-switcher';
 import { HousingSwitcher } from './housing-switcher';
+import { EditableBuildingsSwitcher } from './editable-buildings-switcher';
 import { BuildingMapTileset } from '../config/tileserver-config';
 import { useDisplayPreferences } from '../displayPreferences-context';
 import { CategoryMapDefinition } from '../config/category-maps-config';
@@ -161,28 +162,29 @@ export const ColouringMap : FC<ColouringMapProps> = ({
                 mode !== 'basic' &&
                 <>
                     <Legend mapColourScaleDefinitions={categoryMapDefinitions} mapColourScale={mapColourScale} onMapColourScale={onMapColourScale}/>
-                    <div className="switchers-of-layers-map-menu">
-                        <ThemeSwitcher onSubmit={darkLightThemeSwitch} currentTheme={darkLightTheme} />
-                        <DataLayerSwitcher />
-                        {
-                            (showLayerSelection == "enabled") ?
-                            <>
-                                <BoroughSwitcher/>
-                                <ParcelSwitcher/>
-                                <FloodSwitcher/>
-                                <ConservationAreaSwitcher/>
-                                <HistoricMapSwitcher/>
-                                <HistoricDataSwitcher/>
-                                <VistaSwitcher />
-                                <HousingSwitcher />
-                                <CreativeSwitcher />
-                            </>
-                            : <></>
-                        }
-                    </div>
-                    <SearchBox onLocate={handleLocate} />
                 </>
             }
+            <div className="switchers-of-layers-map-menu">
+                <ThemeSwitcher onSubmit={darkLightThemeSwitch} currentTheme={darkLightTheme} />
+                <DataLayerSwitcher />
+                {
+                    (showLayerSelection == "enabled") ?
+                    <>
+                        <BoroughSwitcher/>
+                        <ParcelSwitcher/>
+                        <FloodSwitcher/>
+                        <ConservationAreaSwitcher/>
+                        { /* <HistoricMapSwitcher/> */ }
+                        { /* <HistoricDataSwitcher/> */ }
+                        <VistaSwitcher />
+                        <HousingSwitcher />
+                        <CreativeSwitcher />
+                        <EditableBuildingsSwitcher />
+                    </>
+                    : <></>
+                }
+            </div>
+            <SearchBox onLocate={handleLocate} />
         </div>
     );
 }

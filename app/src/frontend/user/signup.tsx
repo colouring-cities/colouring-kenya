@@ -29,17 +29,17 @@ export const SignUp: React.FC = () => {
         [username, email, confirmEmail, password, confirmConditions, signup]
     );
 
-    const msgName = `Welcome to Colouring ${config.cityName}. You're one of the first people to sign up!`
+    const msgName = `Welcome to Colouring ${config.cityName}. You're one of the first people to sign up!`;
+    const issuesURL = config.githubURL + "/issues";
+    const discussURL = config.githubURL + "/discussions";
 
     return (
         <article>
             <section className="main-col">
                 <h1 className="h2">Sign up</h1>
                 <InfoBox msg={msgName}>
-                    <br/>Please <a href="https://discuss.colouring.london/">discuss
-                    suggestions for improvements</a> and <a
-                        href="https://github.com/colouring-cities/colouring-core/issues">
-                    report issues or problems</a>.
+                    <br/>Please <a href={discussURL}>discuss suggestions for improvements</a> and {' '}
+                    <a href={issuesURL}>report issues or problems</a>.
                 </InfoBox>
                 <p>
                     Create an account to start colouring in.
@@ -99,10 +99,9 @@ export const SignUp: React.FC = () => {
                             onChange={e => setConfirmConditions(e.target.checked)}
                             required />
                         <label className="form-check-label" htmlFor="confirm_conditions">
-                            I confirm that I have read and agree to the <Link
-                                to="/privacy-policy.html">privacy policy</Link>, <Link
-                                to="/contributor-agreement.html">contributor agreement</Link> and <Link
-                                to="/data-accuracy.html">data accuracy agreement</Link>.
+                            I confirm that I have read and agree to the {' '}  
+                                <a href="https://github.com/colouring-cities/manual/wiki/F2.-PROTOCOLS-&-CODES-OF-CONDUCT#ccrp-contributor-privacy-policy">privacy policy</a>,{' and the '}  
+                                <a href="https://github.com/colouring-cities/manual/wiki/F2.-PROTOCOLS-&-CODES-OF-CONDUCT#ccrp-contributor--data-user-data-accuracy--ethical-use-agreement">contributor & data user data accuracy & ethical use agreement</a>.
                         </label>
                     </div>
 
@@ -111,7 +110,7 @@ export const SignUp: React.FC = () => {
                         {isLoading && <span><SpinnerIcon/>Sending sign up data...</span>}
                     </div>
                     <InfoBox msg="">
-                        Please also read our <a href="https://github.com/colouring-cities/manual/wiki/F1.-ETHICAL-FRAMEWORK-and-ethics-policies">data ethics policy</a> before using or sharing our data
+                        Please also read our <a href="https://github.com/colouring-cities/manual/wiki/ETHICAL-FRAMEWORK#ccrp-data-ethics-policies">data ethics policy</a> before using or sharing our data
                     </InfoBox>
 
                     Do you already have an account?
