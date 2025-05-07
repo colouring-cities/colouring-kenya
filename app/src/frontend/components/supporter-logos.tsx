@@ -19,6 +19,12 @@ const SupporterLogos = () => (
                 </a>
             </li>
             <li>
+                <a href="https://www.dkut.ac.ke/">
+                    <img src="images/logo-dkut.JPG"
+                        alt="Dedan Kimathi University of Technology" />
+                </a>
+            </li>
+            <li>
                 <a href="https://www.historicengland.org.uk/">
                     <img src="images/logo-he.png"
                         alt="Historic England" />
