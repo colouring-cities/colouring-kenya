@@ -728,7 +728,7 @@ export const dataFields = { /* eslint-disable @typescript-eslint/camelcase */
         category: Category.RetrofitCondition,
         title: "Land parcel geometry link",
         example: "https://",
-        tooltip: "Please provide a link to the land parcel geometry for this building" //(<a href='https://www.gov.uk/guidance/inspire-index-polygons-spatial-data'>INSPIRE Polygons</a>)",
+        tooltip: "Please provide a link to the land parcel geometry for this building (<a href='https://www.gov.uk/guidance/inspire-index-polygons-spatial-data'>INSPIRE Polygons</a>)",
     },
     size_parcel_geometry_source_type: {
         category: Category.EnergyPerformance,
@@ -1219,14 +1219,14 @@ export const dataFields = { /* eslint-disable @typescript-eslint/camelcase */
     planning_listed: {
         category: Category.UrbanInfrastructure,
         title: "Is this a listed building?",
-        tooltip: "Is the building a listed building" // according to <a href=\"https://historicengland.org.uk/advice/hpg/has/whs/\" target=\"_blank\">Historic England</a>",
+        tooltip: "Is the building a listed building according to <a href=\"https://historicengland.org.uk/advice/hpg/has/whs/\" target=\"_blank\">Historic England</a>",
         example: true,
     },
     planning_list_id: {
         category: Category.UrbanInfrastructure,
         title: "If the building is on a national heritage register, please add the ID:",
         example: "121436",
-        tooltip: "e.g. National Heritage List for Kenya",
+        tooltip: "e.g. National Heritage List for England (NHLE)",
     },
     planning_list_grade: {
         category: Category.UrbanInfrastructure,
@@ -1345,13 +1345,13 @@ export const dataFields = { /* eslint-disable @typescript-eslint/camelcase */
     planning_flood_zone: {
         category: Category.UrbanInfrastructure,
         title: "Is the building inside a Flood Zone?",
-        tooltip: "All areas with more than a 1 in 1,000 annual probability of either river or sea flooding.",
+        tooltip: "the GLA official description: \"All areas with more than a 1 in 1,000 annual probability of either river or sea flooding.\"",
         example: true,
     },
     planning_housing_zone: {
         category: Category.UrbanInfrastructure,
         title: "Is the building in a Housing Zone?",
-        tooltip: " Housing Zones as classified by the Ministry of Lands and Physical Planning "//the GLA official description: \"Housing zones are areas funded by the Mayor and government to attract developers and relevant partners to build new homes.\"",
+        tooltip: "the GLA official description: \"Housing zones are areas funded by the Mayor and government to attract developers and relevant partners to build new homes.\"",
         example: true,
     },
     planning_enterprise_zone: {
@@ -1365,8 +1365,8 @@ export const dataFields = { /* eslint-disable @typescript-eslint/camelcase */
         title: "Is the building within a Protected Vista?",
         tooltip: "GLA official description: \"The Protected Vistas are established in the London Plan with more detailed guidance provided in the London View Management Framework (LVMF). The London Plan seeks to protect the significant views which help to define London, including the panoramas, linear views and townscape views in this layer.\"",
         example: true,
+
     }, 
-    
 
     is_domestic: {
         category: Category.EnergyPerformance,
@@ -2291,7 +2291,7 @@ export const dataFields = { /* eslint-disable @typescript-eslint/camelcase */
     typology_original_use: {
         category: Category.TypologySize,
         title: "Which land use best describes the purpose for which the building was built?",
-        tooltip: "Land use Groups as classified by Ministry of Lands and Physical Planning" //[NLUD](https://www.gov.uk/government/statistics/national-land-use-database-land-use-and-land-cover-classification).\n\nNote: Homes used as offices for working from home should be classified as residential.",
+        tooltip: "Land use Groups as classified by [NLUD](https://www.gov.uk/government/statistics/national-land-use-database-land-use-and-land-cover-classification).\n\nNote: Homes used as offices for working from home should be classified as residential.",
         example: ["", ""],
     },
     typology_original_use_verified: {
@@ -2302,7 +2302,7 @@ export const dataFields = { /* eslint-disable @typescript-eslint/camelcase */
     typology_original_use_order: {
         category: Category.TypologySize,
         title: "Original land use (order)",
-        tooltip: "Land use Order as classified by Ministry of Lands and Physical Planning" //[NLUD](https://www.gov.uk/government/statistics/national-land-use-database-land-use-and-land-cover-classification). Derived automatically from the data above.",
+        tooltip: "Land use Order as classified by [NLUD](https://www.gov.uk/government/statistics/national-land-use-database-land-use-and-land-cover-classification). Derived automatically from the data above.",
         example: "",
     },
     typology_original_use_source_type: {
