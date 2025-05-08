@@ -784,10 +784,7 @@ export const categoryMapsConfig: {[key in Category]: CategoryMapDefinition[]} = 
                     }, {
                         text: 'Minimal ',
                         color: '#feb24c',
-                    }, {
-                        text: 'Building impacted (no damage info) ',
-                        color: '#feb24c',
-                    }, {
+                    },{
                         text: 'No damage visible',
                         color: '#fed976',
                     },
