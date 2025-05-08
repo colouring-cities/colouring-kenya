@@ -1354,7 +1354,7 @@ export const dataFields = { /* eslint-disable @typescript-eslint/camelcase */
         tooltip: " Housing Zones as classified by the Ministry of Lands and Physical Planning "//the GLA official description: \"Housing zones are areas funded by the Mayor and government to attract developers and relevant partners to build new homes.\"",
         example: true,
     },
-   /* planning_enterprise_zone: {
+    planning_enterprise_zone: {
         category: Category.UrbanInfrastructure,
         title: "Is the building in a Creative Enterprise Zone?",
         tooltip: "GLA official description: \"Creative Enterprise Zones are a new Mayoral initiative to designate areas of London where artists and creative businesses can find permanent affordable space to work; are supported to start-up and grow; and where local people are helped to learn creative sector skills and find new jobs.\"",
@@ -1365,7 +1365,7 @@ export const dataFields = { /* eslint-disable @typescript-eslint/camelcase */
         title: "Is the building within a Protected Vista?",
         tooltip: "GLA official description: \"The Protected Vistas are established in the London Plan with more detailed guidance provided in the London View Management Framework (LVMF). The London Plan seeks to protect the significant views which help to define London, including the panoramas, linear views and townscape views in this layer.\"",
         example: true,
-    }, */
+    }, 
     
 
     is_domestic: {
