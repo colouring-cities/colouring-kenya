@@ -51,9 +51,6 @@ const Welcome = () => (
         <div className="image-row">
             <img src="images/logo-loughborough.png" alt="Colouring Cities collaborating organisations: Loughborough University" />
         </div>
-        <div className="image-row">
-            <img src="images/logo-dkut.JPG" alt="Colouring Cities collaborating organisations: Dedan Kimathi University of Technology" />
-        </div>
     </div>
 );
 
