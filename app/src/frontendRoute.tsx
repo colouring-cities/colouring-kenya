@@ -96,12 +96,12 @@ function renderHTML(context, data, req, res) {
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta charset="utf-8" />
 
-        <meta property="og:url"                content="https://colouring.kenya" />
+        <meta property="og:url"                content="https://colouring.london" />
         <meta property="og:type"               content="website" />
         <meta property="og:title"              content="Colouring ${config.cityName}" />
         <meta property="og:description"        content="Colouring ${config.cityName} is a knowledge exchange platform collecting information on every building in Kenya, to help make the country more sustainable. We’re building it at Dedan Kimathi University of Technology." />
-        <meta property="og:locale"             content="en_KE" />
-        <meta property="og:image"              content="https://colouring.kenya/images/logo-dkut.JPG" />
+        <meta property="og:locale"             content="en_GB" />
+        <meta property="og:image"              content="https://colouring.london/images/logo-cl-square.png" />
 
         <link rel="manifest" href="site.webmanifest">
 

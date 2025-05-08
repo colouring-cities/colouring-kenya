@@ -19,8 +19,8 @@ osmnx.config(log_console=True, use_cache=True)
 size = 256
 
 # load buildings from about 1.5km² around Nairobi
-point = (-1.286389, 36.817223)
-dist = 1500
+point = (-1.270192, 36.919725)
+dist = 2500
 tags = {"building": True}
 gdf = osmnx.features_from_point(point, tags, dist=dist)
 
