@@ -9,7 +9,7 @@ export function FloodBoundaryLayer() {
     const { flood } = useDisplayPreferences();
 
     useEffect(() => {
-        apiGet('/geometries/flood_zones_simplified.geojson')
+        apiGet('/geometries/Nairobi_Flood-extent_May24.geojson')
             .then(data => setBoundaryGeojson(data as GeoJsonObject));
     }, []);
 
